@@ -127,7 +127,7 @@ class NexisApp(ctk.CTk):
                 if not results:
                     self.append_output("No matching files found.")
                 else:
-                    for i, r in enumerate(results):
+                    for i, r in enumerate(results[:1]):
                         self.append_output(f"{i+1}. {r.get('filename')}\nPath: {r.get('path')}\nSnippet: {r.get('snippet')}")
             
             else:

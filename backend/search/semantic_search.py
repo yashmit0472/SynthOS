@@ -1,12 +1,18 @@
 import logging
 from backend.memory.vector_store import vector_store
+from sentence_transformers import SentenceTransformer
 
 logger = logging.getLogger(__name__)
 
+# Load model once on startup
+logger.info("Loading SentenceTransformer model...")
+embedder = SentenceTransformer("all-MiniLM-L6-v2")
+
 def perform_semantic_search(query):
-    """Queries ChromaDB for semantically similar files."""
+    """Queries ChromaDB for semantically similar files using explicit embeddings."""
     try:
-        results = vector_store.query_documents(query_texts=[query], n_results=3)
+        query_embedding = embedder.encode(query).tolist()
+        results = vector_store.query_documents(query_embeddings=[query_embedding], n_results=1)
         
         matches = []
         if results and results.get("documents") and results["documents"][0]:
