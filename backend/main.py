@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from orchestrator import handle_query
+from backend.orchestrator import handle_query
 
 app = FastAPI()
 

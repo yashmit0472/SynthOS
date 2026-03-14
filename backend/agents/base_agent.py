@@ -1,4 +1,9 @@
 import requests
+import logging
+import time
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
 
@@ -21,13 +26,22 @@ class BaseAgent:
         Respond ONLY in JSON.
         """
 
-        response = requests.post(
-            OLLAMA_URL,
-            json={
-                "model": "llama3",
-                "prompt": prompt,
-                "stream": False
-            }
-        )
-
-        return response.json()["response"]
+        logger.info(f"[{self.role}] Sending request to Ollama...")
+        start_time = time.time()
+        
+        try:
+            response = requests.post(
+                OLLAMA_URL,
+                json={
+                    "model": "llama3",
+                    "prompt": prompt,
+                    "stream": False
+                },
+                timeout=120 # Add a timeout so it doesn't hang forever
+            )
+            response.raise_for_status()
+            logger.info(f"[{self.role}] Received response from Ollama in {time.time() - start_time:.2f}s")
+            return response.json()["response"]
+        except Exception as e:
+            logger.error(f"[{self.role}] Error calling Ollama: {str(e)}")
+            return '{"error": "Failed to generate response"}'
